@@ -2516,8 +2516,8 @@ eUpdateNav();
             <span style="font-size:.75rem;padding:3px 10px;border-radius:12px;background:rgba(201,164,77,.14);color:#7a5c10;border:1px solid rgba(201,164,77,.3);">Stress</span>
           </div>
           <div class="livret-actions">
-            <button class="btn-gold-sm" onclick="window.open('recettes.pdf','_blank')">📥 Télécharger le livret (PDF)</button>
-            <button class="btn-wh" onclick="window.open('recettes.pdf','_blank')">↗ Ouvrir le livret</button>
+            <button class="btn-gold-sm" onclick="downloadPdfFromFile('recettes.pdf','Livret_recettes.pdf')">📥 Télécharger le livret (PDF)</button>
+            <button class="btn-wh" onclick="downloadPdfFromFile('recettes.pdf','Livret_recettes.pdf')">↗ Télécharger le livret</button>
           </div>
         </div>
         <div class="livret-mockup">
@@ -2590,7 +2590,7 @@ eUpdateNav();
             <button class="btn-gold-sm" onclick="openImgModal(0)">👁 Aperçu fiche complète (FR + AR)</button>
           </div>
         </div>
-        <div class="res-card"><div class="rc-icon-wrap" style="background:rgba(29,158,117,.1);">🫕</div><h3>Livret de recettes protectrices</h3><p class="rc-desc">7 recettes algériennes revisitées : chorba aux lentilles, salade de pois chiches, couscous aux légumineuses, lben du soir, infusion cumin-cannelle-dattes, energy balls…</p><div class="pdf-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem;"><button class="btn-navy-sm" onclick="window.open('recettes.pdf','_blank')">📥 Télécharger (PDF)</button><button class="btn-voir" onclick="window.open('recettes.pdf','_blank')">↗ Ouvrir</button></div></div>
+        <div class="res-card"><div class="rc-icon-wrap" style="background:rgba(29,158,117,.1);">🫕</div><h3>Livret de recettes protectrices</h3><p class="rc-desc">7 recettes algériennes revisitées : chorba aux lentilles, salade de pois chiches, couscous aux légumineuses, lben du soir, infusion cumin-cannelle-dattes, energy balls…</p><div class="pdf-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem;"><button class="btn-navy-sm" onclick="downloadPdfFromFile('recettes.pdf','Livret_recettes.pdf')">📥 Télécharger (PDF)</button><button class="btn-voir" onclick="downloadPdfFromFile('recettes.pdf','Livret_recettes.pdf')">↗ Télécharger</button></div></div>
         <div class="res-card"><div class="rc-icon-wrap rc-iw-red">🏥</div><h3>Vous avez une pathologie ?</h3><p class="rc-desc">Si vous avez un diabète, une maladie rénale, cardiovasculaire ou autre, les recommandations générales peuvent ne pas être adaptées. Contactez-nous.</p><div class="pdf-actions" style="margin-top:1rem;"><button class="btn-navy-sm" style="width:100%;" onclick="goPage('contact')">✉️ Contacter un diététicien</button></div></div>
       </div>
       <div class="share-section"><h2>Partagez avec votre famille</h2><p class="share-desc">Ce que vous apprenez ici peut protéger vos proches. Partagez ce site avec votre famille — surtout si vous avez des antécédents de diabète dans votre entourage.</p><div class="share-btns"><button class="btn-share-gold" onclick="sharesite()">📢 Partager le site</button><button class="btn-share-out" onclick="copyLink()">🔗 Copier le lien</button></div></div>
@@ -3010,15 +3010,16 @@ function downloadPdfBase64(b64, filename) {
 }
 
 // Download PDF directly
-async function downloadPdfFromFile(filename, saveName) {
-  try {
-    const blobUrl = await fetchAsBlobUrl(filename, 'application/pdf');
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = saveName || filename.split('/').pop();
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
-  } catch(e) { alert('Erreur de téléchargement — vérifiez que les fichiers PDF sont bien présents.'); }
+function downloadPdfFromFile(filename, saveName) {
+  // Crée un lien caché avec download attr - ne redirige jamais la page
+  var a = document.createElement('a');
+  a.href = filename;
+  a.download = saveName || filename;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); }, 1000);
 }
 
 // Load fiche images on demand for the gallery
